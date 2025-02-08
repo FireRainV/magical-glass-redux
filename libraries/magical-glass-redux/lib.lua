@@ -259,7 +259,9 @@ function lib:preInit()
         ["damage_numbers"]     = 150,
         ["top"]                = 1000
     }
+end
 
+function lib:onRegistered()
     self.random_encounters = {}
     for _,path,rnd_enc in Registry.iterScripts("battle/randomencounters") do
         assert(rnd_enc ~= nil, '"randomencounters/'..path..'.lua" does not return value')
