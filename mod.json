@@ -3,7 +3,7 @@
     "name": "Magical Glass: Redux",
     "subtitle": "The Undertale Library!",
 
-    "version": "v3.4.5",
+    "version": "v3.4.9",
     "engineVer": "v0.10.0-dev",
 
     "chapter": 4,
@@ -29,6 +29,7 @@
             "lightCurrency": "Gold",
             "lightCurrencyShort": "G",
             "overworldSpells": true,
+            "canTossLightWeapons": true,
             //"targetSystem": true,
             // End of config
         },
