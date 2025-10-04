@@ -84,21 +84,21 @@ end
 function LightActionBox:snapSoulToButton()
     if self:getSelectableButtons() then
         if self.selected_button < 1 then
-            self.selected_button = #self:getSelectableButtons()
+            self.selected_button = #self.buttons
         end
 
-        if self.selected_button > #self:getSelectableButtons() then
+        if self.selected_button > #self.buttons then
             self.selected_button = 1
         end
 
-        Game.battle.soul.x = self:getSelectableButtons()[self.selected_button].x - 19
-        Game.battle.soul.y = self:getSelectableButtons()[self.selected_button].y + 279
+        Game.battle.soul.x = self.buttons[self.selected_button].x - 19
+        Game.battle.soul.y = self.buttons[self.selected_button].y + 279
     end
 end
 
 function LightActionBox:update()
     if self.buttons then
-        for i,button in ipairs(self.buttons) do
+        for i,button in ipairs(self:getSelectableButtons()) do
             if (Game.battle.current_selecting == 0 and self.index == 1) or (Game.battle.current_selecting == self.index) then
                 button.visible = true
             else

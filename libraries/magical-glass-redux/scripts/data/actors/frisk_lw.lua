@@ -73,6 +73,8 @@ function actor:init()
         ["walk/right"] = "walk/right",
     }
 
+    local x, y = 0, 4
+
     self.offsets = {
         -- Movement offsets
         ["walk/left"] = {2.5, 1},
@@ -81,28 +83,28 @@ function actor:init()
         ["walk/down"] = {0.5, 1},
 
         -- Battle offsets
-        ["battle/idle"] = {0, 0},
-        ["battle/attack_ready"] = {0, 0},
-        ["battle/hurt"] = {0, 0},
-        ["battle/down"] = {0, 0},
-        ["battle/spare"] = {0, 0},
+        ["battle/idle"] = {x, y},
+        ["battle/attack_ready"] = {x, y},
+        ["battle/hurt"] = {x, y},
+        ["battle/down"] = {x, y},
+        ["battle/spare"] = {x, y},
 
-        ["battle/idle"] = {0, 0},
+        ["battle/idle"] = {x, y},
 
-        ["battle/attack"] = {0, 0},
-        ["battle/attackready"] = {0, 0},
-        ["battle/act"] = {0, 0},
-        ["battle/actend"] = {0, 0},
-        ["battle/actready"] = {0, 0},
-        ["battle/item"] = {0, 0},
-        ["battle/itemready"] = {0, 0},
-        ["battle/defend"] = {0, 0},
+        ["battle/attack"] = {x, y},
+        ["battle/attackready"] = {x, y},
+        ["battle/act"] = {x, y},
+        ["battle/actend"] = {x, y},
+        ["battle/actready"] = {x, y},
+        ["battle/item"] = {x, y},
+        ["battle/itemready"] = {x, y},
+        ["battle/defend"] = {x, y},
 
-        ["battle/defeat"] = {0, 0},
-        ["battle/hurt"] = {0, 0},
+        ["battle/defeat"] = {x, y},
+        ["battle/hurt"] = {x, y},
 
-        ["battle/intro"] = {0, 0},
-        ["battle/victory"] = {0, 0}
+        ["battle/intro"] = {x, y},
+        ["battle/victory"] = {x, y}
     }
 end
 
