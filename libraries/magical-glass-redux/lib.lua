@@ -4207,27 +4207,35 @@ function lib:init()
         end
         
         local reload_buttons = 0
-        if not self.battler.already_has_flee_button and Game.battle.encounter.can_flee then
-            if Game.battle:getPartyIndex(battle_leader) == Game.battle.current_selecting and (Input.pressed("up") or Input.pressed("down")) then
-                if self.hovered then
-                    local last_type = self.type
-                    if last_type == "spare" then
-                        self.battler.flee_button = true
-                        reload_buttons = 1
-                        Game.battle.ui_move:stop()
-                        Game.battle.ui_move:play()
-                    end
-                    if last_type == "flee" then
-                        self.battler.flee_button = false
-                        reload_buttons = 1
-                        Game.battle.ui_move:stop()
-                        Game.battle.ui_move:play()
+        if not self.battler.already_has_flee_button then
+            if Game.battle.encounter.can_flee then
+                if Game.battle:getPartyIndex(battle_leader) == Game.battle.current_selecting and (Input.pressed("up") or Input.pressed("down")) then
+                    if self.hovered then
+                        local last_type = self.type
+                        if last_type == "spare" then
+                            self.battler.flee_button = true
+                            reload_buttons = 1
+                            Game.battle.ui_move:stop()
+                            Game.battle.ui_move:play()
+                        end
+                        if last_type == "flee" then
+                            self.battler.flee_button = false
+                            reload_buttons = 1
+                            Game.battle.ui_move:stop()
+                            Game.battle.ui_move:play()
+                        end
                     end
                 end
-            end
-            if self.type == "flee" and Game.battle:getPartyIndex(self.battler.chara.id) ~= Game.battle.current_selecting then
-                self.battler.flee_button = false
-                reload_buttons = 2
+                if self.battler.flee_button == true and Game.battle:getPartyIndex(self.battler.chara.id) ~= Game.battle.current_selecting then
+                    self.battler.flee_button = false
+                    reload_buttons = 2
+                end
+            else
+                if self.battler.flee_button == true and Game.battle:getPartyIndex(self.battler.chara.id) == Game.battle.current_selecting then
+                    print(true)
+                    self.battler.flee_button = false
+                    reload_buttons = 2
+                end
             end
         end
         
