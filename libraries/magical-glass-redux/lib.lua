@@ -238,7 +238,7 @@ function lib:preInit()
         ["light_world_dark_battle_color"] = COLORS.white,
         ["light_world_dark_battle_color_attackbar"] = COLORS.lime,
         ["light_world_dark_battle_color_attackbox"] = {0.5, 0, 0, 1},
-        ["light_world_dark_battle_color_damage_single"] = COLORS.white,
+        ["light_world_dark_battle_color_damage_single"] = {1, 0.3, 0.3, 1},
     }
     
     MG_EVENT = {
