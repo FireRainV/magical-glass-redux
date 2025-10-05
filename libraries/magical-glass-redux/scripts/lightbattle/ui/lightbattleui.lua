@@ -878,6 +878,9 @@ function LightBattleUI:drawState()
                 love.graphics.rectangle("fill", 420, 10 + ((index - page_offset - 1) * 32), 101, 17)
 
                 local percentage = Game.battle.party[index].chara:getHealth() / Game.battle.party[index].chara:getStat("health")
+                -- Chapter 3 introduces this lower limit, but all chapters in Kristal might as well have it
+                -- Swooning is the only time you can ever see it this low
+                percentage = math.max(-1, percentage)
                 if Game:isLight() then
                     Draw.setColor(MG_PALETTE["action_health"])
                 else
