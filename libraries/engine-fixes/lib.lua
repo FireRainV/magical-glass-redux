@@ -251,36 +251,6 @@ function lib:init()
         self.level_up_count = data.level_up_count or self.level_up_count
     end)
     
-    Utils.hook(PartyBattler, "calculateDamage", function(orig, self, amount)
-        local def = self.chara:getStat("defense")
-        local max_hp = self.chara:getStat("health")
-
-        local threshold_a = (max_hp / 5)
-        local threshold_b = (max_hp / 8)
-        for i = 1, math.abs(def) do
-            if amount > threshold_a then
-                amount = amount + (def >= 0 and -3 or 3)
-            elseif amount > threshold_b then
-                amount = amount + (def >= 0 and -2 or 2)
-            else
-                amount = amount + (def >= 0 and -1 or 1)
-            end
-            if def >= 0 then
-                if amount <= 0 or def == math.huge then
-                    amount = 0
-                    break
-                end
-            else
-                if amount == math.huge or def == -math.huge then
-                    amount = math.huge
-                    break
-                end
-            end
-        end
-
-        return math.max(amount, 1)
-    end)
-    
     Utils.hook(ActionBoxDisplay, "draw", function(orig, self) -- Fixes an issue with HP higher than normal + MGR Karma
         if #Game.battle.party <= 3 then
             if Game.battle.current_selecting == self.actbox.index then
