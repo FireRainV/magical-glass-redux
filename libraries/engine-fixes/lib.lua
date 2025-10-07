@@ -113,11 +113,6 @@ function lib:init()
         end
     end)
     
-    -- Stops the camera shake.
-    Utils.hook(World, "stopCameraShake", function(orig, self)
-        self.camera:stopShake()
-    end)
-    
     Utils.hook(World, "hurtParty", function(orig, self, battler, amount)
         Assets.playSound("hurt")
 
@@ -162,7 +157,7 @@ function lib:init()
                     party:setHealth(0)
                 end
             end
-            self:stopCameraShake()
+            self:shakeCamera(0)
             if not self.map:onGameOver() then
                 Game:gameOver(self.soul:getScreenPos())
             end

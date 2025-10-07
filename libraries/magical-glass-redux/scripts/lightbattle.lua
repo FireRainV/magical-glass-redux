@@ -1616,7 +1616,7 @@ function LightBattle:checkGameOver()
             wave:onEnd(true)
         end
     end
-    self:stopCameraShake()
+    self:shakeCamera(0)
     if self.encounter:onGameOver() then
         return
     end
@@ -2447,10 +2447,6 @@ end
 
 function LightBattle:shakeCamera(x, y, friction)
     self.camera:shake(x, y, friction)
-end
-
-function LightBattle:stopCameraShake()
-    self.camera:stopShake()
 end
 
 function LightBattle:randomTargetOld()
