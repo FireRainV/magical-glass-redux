@@ -35,6 +35,11 @@
         /////
         "shared_light_exp": false,
 
+        ///// Enables single reticle weapons to crit
+        ///// Deals 25 percent more damage when criting
+        /////
+        "deltatraveler_crits": false,
+
         ///// Light Battle TP
         // Enables tension and grazing in Light Battles.
         // In addition, adds the Defend command to the mercy action button in Light Battles.

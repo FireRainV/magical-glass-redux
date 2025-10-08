@@ -337,18 +337,6 @@ function LightBattle:getState()
     return self.state
 end
 
-function LightBattle:_getEnemyByIndex(index)
-    local enemy = self.enemies_index[index]
-    if not enemy then return nil end
-    return enemy
-end
-
-function LightBattle:_isEnemyByIndexSelectable(index)
-    local enemy = self:_getEnemyByIndex(index)
-    if not enemy then return false end
-    return enemy.selectable
-end
-
 function LightBattle:onSubStateChange(old, new) end
 
 function LightBattle:registerXAction(party, name, description, tp)
@@ -933,7 +921,7 @@ function LightBattle:onStateChange(old,new)
             self.current_menu_y = 1
         end
 
-        if #self.enemies_index > 0 and not self:_isEnemyByIndexSelectable(self.current_menu_y) then
+        if not (self.enemies_index[self.current_menu_y] and self.enemies_index[self.current_menu_y].selectable) and #self.enemies_index > 0 then
             local give_up = 0
             repeat
                 give_up = give_up + 1
@@ -943,7 +931,7 @@ function LightBattle:onStateChange(old,new)
                 if self.current_menu_y > #self.enemies_index then
                     self.current_menu_y = 1
                 end
-            until self:_isEnemyByIndexSelectable(self.current_menu_y)
+            until (self.enemies_index[self.current_menu_y] and self.enemies_index[self.current_menu_y].selectable)
         end
 
     elseif new == "PARTYSELECT" then
@@ -1427,7 +1415,7 @@ function LightBattle:nextTurn()
     if self.battle_ui then
         local found = false
         for _,action_box in ipairs(self.battle_ui.action_boxes) do
-            for i,button in ipairs(action_box:getSelectableButtons() or {}) do
+            for i,button in ipairs(action_box.buttons or {}) do
                 if button.type == self.last_button_type then
                     action_box.selected_button = i
                     found = true
@@ -1443,7 +1431,7 @@ function LightBattle:nextTurn()
                     end
                 end
                 if group then
-                    for i,button in ipairs(action_box:getSelectableButtons() or {}) do
+                    for i,button in ipairs(action_box.buttons or {}) do
                         if Utils.containsValue(group, button.type) then
                             action_box.selected_button = i
                             found = true
@@ -2755,7 +2743,7 @@ function LightBattle:nextParty()
     local found = false
     for _,action_box in ipairs(self.battle_ui.action_boxes) do
         if action_box.battler == self.party[last_selected] then
-            for i,button in ipairs(action_box:getSelectableButtons() or {}) do
+            for i,button in ipairs(action_box.buttons or {}) do
                 if i == action_box.last_button then
                     last_button_type = button.type
                     break
@@ -2766,7 +2754,7 @@ function LightBattle:nextParty()
     end
     for _,action_box in ipairs(self.battle_ui.action_boxes) do
         if action_box.battler == self.party[self.current_selecting] then
-            for i,button in ipairs(action_box:getSelectableButtons() or {}) do
+            for i,button in ipairs(action_box.buttons or {}) do
                 if button.type == last_button_type then
                     action_box.selected_button = i
                     found = true
@@ -2782,7 +2770,7 @@ function LightBattle:nextParty()
                     end
                 end
                 if group then
-                    for i,button in ipairs(action_box:getSelectableButtons() or {}) do
+                    for i,button in ipairs(action_box.buttons or {}) do
                         if Utils.containsValue(group, button.type) then
                             action_box.selected_button = i
                             found = true
@@ -3109,21 +3097,21 @@ function LightBattle:onKeyPressed(key)
             self.ui_select:play()
             if #self.enemies_index == 0 then return end
             self.selected_enemy = self.current_menu_y
-            local enemy = self:_getEnemyByIndex(self.selected_enemy)
             if self.state_reason == "XACT" then
                 local xaction = Utils.copy(self.selected_xaction)
                 if xaction.default then
-                    xaction.name = enemy:getXAction(self.party[self.current_selecting])
+                    xaction.name = self.enemies_index[self.selected_enemy]:getXAction(self.party[self.current_selecting])
                 end
-                self:pushAction("XACT", enemy, xaction)
+                self:pushAction("XACT", self.enemies_index[self.selected_enemy], xaction)
             elseif self.state_reason == "SPARE" then
-                self:pushAction("SPARE", enemy)
-            elseif self.state_reason == "ACT" and self.party[self.current_selecting].has_save and enemy.save_no_acts then
-                self:pushAction("SAVE", enemy)
+                self:pushAction("SPARE", self.enemies_index[self.selected_enemy])
+            elseif self.state_reason == "ACT" and self.party[self.current_selecting].has_save and self.enemies_index[self.selected_enemy].save_no_acts then
+                self:pushAction("SAVE", self.enemies_index[self.selected_enemy])
             elseif self.state_reason == "ACT" then
                 self:clearMenuItems()
                 self.current_menu_columns = 2
                 self.current_menu_rows = 3
+                local enemy = self.enemies_index[self.selected_enemy]
                 for _,v in ipairs(enemy.acts) do
                     local insert = not v.hidden
                     if v.character and self.party[self.current_selecting].chara.id ~= v.character then
@@ -3154,11 +3142,11 @@ function LightBattle:onKeyPressed(key)
                 end
                 self:setState("MENUSELECT", "ACT")
             elseif self.state_reason == "ATTACK" then
-                self:pushAction("ATTACK", enemy)
+                self:pushAction("ATTACK", self.enemies_index[self.selected_enemy])
             elseif self.state_reason == "SPELL" then
-                self:pushAction("SPELL", enemy, self.selected_spell)
+                self:pushAction("SPELL", self.enemies_index[self.selected_enemy], self.selected_spell)
             elseif self.state_reason == "ITEM" then
-                self:pushAction("ITEM", enemy, self.selected_item)
+                self:pushAction("ITEM", self.enemies_index[self.selected_enemy], self.selected_item)
             else
                 self:nextParty()
             end
@@ -3191,7 +3179,7 @@ function LightBattle:onKeyPressed(key)
                 if self.current_menu_y < 1 then
                     self.current_menu_y = #self.enemies_index
                 end
-            until self:_isEnemyByIndexSelectable(self.current_menu_y)
+            until (self.enemies_index[self.current_menu_y] and self.enemies_index[self.current_menu_y].selectable)
 
             if self.current_menu_y ~= old_location then
                 self.ui_move:stop()
@@ -3209,7 +3197,7 @@ function LightBattle:onKeyPressed(key)
                 if self.current_menu_y > #self.enemies_index then
                     self.current_menu_y = 1
                 end
-            until self:_isEnemyByIndexSelectable(self.current_menu_y)
+            until (self.enemies_index[self.current_menu_y] and self.enemies_index[self.current_menu_y].selectable)
 
             if self.current_menu_y ~= old_location then
                 self.ui_move:stop()
@@ -3287,9 +3275,6 @@ end
 function LightBattle:handleActionSelectInput(key)
     if not self.encounter.event then
         local actbox = self.battle_ui.action_boxes[self.current_selecting]
-        local old_selected_button = actbox.selected_button
-        
-        local buttons = actbox:getSelectableButtons()
 
         if Input.isConfirm(key) then
             actbox:select()
@@ -3304,24 +3289,18 @@ function LightBattle:handleActionSelectInput(key)
             if self.current_selecting ~= old_selecting then
                 self.ui_move:stop()
                 self.ui_move:play()
-                actbox:unselect()
+                self.battle_ui.action_boxes[self.current_selecting]:unselect()
             end
             return
-        elseif Input.is("left", key) and #buttons > 1 then
+        elseif Input.is("left", key) and #self.battle_ui.action_boxes[self.current_selecting].buttons > 1 then
             actbox.selected_button = actbox.selected_button - 1
-        elseif Input.is("right", key) and #buttons > 1 then
+            self.ui_move:stop()
+            self.ui_move:play()
+            if actbox then
+                actbox:snapSoulToButton()
+            end
+        elseif Input.is("right", key) and #self.battle_ui.action_boxes[self.current_selecting].buttons > 1 then
             actbox.selected_button = actbox.selected_button + 1
-        end
-        
-        if actbox.selected_button < 1 then
-            actbox.selected_button = #buttons
-        end
-
-        if actbox.selected_button > #buttons then
-            actbox.selected_button = 1
-        end
-
-        if old_selected_button ~= actbox.selected_button then
             self.ui_move:stop()
             self.ui_move:play()
             if actbox then

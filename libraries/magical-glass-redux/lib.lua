@@ -1789,6 +1789,9 @@ function lib:init()
         sprite.layer = LIGHT_BATTLE_LAYERS["above_arena_border"]
         enemy.parent:addChild(sprite)
         -- sprite:play((stretch / 4) / 1.6, false, function(this)
+        if Kristal.getLibConfig("magical-glass", "deltatraveler_crits") then -- Deltraveler stuff
+        stretch = stretch / 2.35
+        end
         sprite:play(Game:isLight() and (stretch / 4) / 1.6 or 1/8, false, function(this) -- dark stuff here
             Game.battle.timer:after(3/30, function()
                 self:onLightAttackHurt(battler, enemy, damage, stretch, crit, Game:isLight())

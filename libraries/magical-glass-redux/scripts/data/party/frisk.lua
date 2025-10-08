@@ -98,13 +98,13 @@ function character:init()
     self.attack_pitch = 1
 
     -- Battle position offset (optional)
-    self.battle_offset = {-4, -3}
+    self.battle_offset = {-4, 7}
     -- Head icon position offset (optional)
     self.head_icon_offset = nil
     -- Menu icon position offset (optional)
     self.menu_icon_offset = nil
     -- Battle soul position offset (optional)
-    self.soul_offset = {9, 12}
+    self.soul_offset = {9, 2}
 
     -- Message shown on gameover (optional)
     self.gameover_message = nil
@@ -151,7 +151,7 @@ end
 
 function character:getBattleOffset()
     if Game:isLight() then
-        return 3, 8
+        return 3, 4
     else
         return super.getBattleOffset(self)
     end
@@ -159,7 +159,7 @@ end
 
 function character:getSoulOffset()
     if Game:isLight() then
-        return 2, 1
+        return 2, 5
     else
         return super.getSoulOffset(self)
     end
