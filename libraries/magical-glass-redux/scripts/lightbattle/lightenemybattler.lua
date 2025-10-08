@@ -858,7 +858,7 @@ function LightEnemyBattler:onHurt(damage, battler)
     end
 
     if self.can_shake then
-        self:getActiveSprite():shake(6, 0, 0.2, 2/30)
+        self:getActiveSprite():shake(6, 0, 0.4, 2/30)
     end
 
     Game.battle.timer:after(1/3, function()
