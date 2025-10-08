@@ -56,6 +56,7 @@ function LightBattle:init()
     self.turn_count = 0
 
     self.arena = nil
+    self.arena_fullscreen = false
     self.soul = nil
 
     self.music = Music()
@@ -1077,6 +1078,7 @@ function LightBattle:onStateChange(old,new)
                 else
                     self.arena:changeShape({SCREEN_WIDTH-10, self.arena.height})
                 end
+                self.arena_fullscreen = true
             elseif has_arena then
                 if self.encounter.event then
                     self.arena:setPosition(arena_x, arena_y)
@@ -1288,6 +1290,7 @@ function LightBattle:onStateChange(old,new)
         self.encounter:onFleeFail()
         self:setState("ACTIONSDONE")
     elseif new == "DEFENDINGEND" then
+        self.arena_fullscreen = false
         if self.encounter.event then
             self:setState("TRANSITIONOUT")
             self.encounter:onBattleEnd()

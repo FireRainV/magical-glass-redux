@@ -97,7 +97,9 @@ function LightPartyBattler:hurt(amount, exact, color, options)
     local swoon = options["swoon"]
     
     self:setSleeping(false)
-    Game.battle:shakeCamera(2, 2, 0.35)
+    if not Game.battle.arena_fullscreen then
+        Game.battle:shakeCamera(2, 2, 0.35)
+    end
 
     if not options["all"] then
         Assets.playSound("hurt")
