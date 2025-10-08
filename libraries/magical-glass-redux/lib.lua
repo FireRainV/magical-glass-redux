@@ -13,6 +13,7 @@ HelpWindow               = libRequire("magical-glass", "scripts/lightbattle/ui/h
 LightDamageNumber        = libRequire("magical-glass", "scripts/lightbattle/ui/lightdamagenumber")
 LightGauge               = libRequire("magical-glass", "scripts/lightbattle/ui/lightgauge")
 LightTensionBar          = libRequire("magical-glass", "scripts/lightbattle/ui/lighttensionbar")
+LightTensionBarGlow      = libRequire("magical-glass", "scripts/lightbattle/ui/lighttensionbarglow")
 LightActionButton        = libRequire("magical-glass", "scripts/lightbattle/ui/lightactionbutton")
 LightActionBox           = libRequire("magical-glass", "scripts/lightbattle/ui/lightactionbox")
 LightAttackBox           = libRequire("magical-glass", "scripts/lightbattle/ui/lightattackbox")
@@ -45,6 +46,7 @@ function lib:unload()
     LightDamageNumber        = nil
     LightGauge               = nil
     LightTensionBar          = nil
+    LightTensionBarGlow      = nil
     LightActionButton        = nil
     LightActionBox           = nil
     LightAttackBox           = nil
