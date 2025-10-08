@@ -7,7 +7,6 @@
 Adds **UNDERTALE** battles (and more!) to Kristal!
 
 * This is the continuation from the point where Magical-Glass by Sam Deluxe was archived.
-* For Magical-Glass 2 by Sam Deluxe, [click here](https://github.com/Idunno1/magical-glass-2)!
 
 ## This library adds:
 * UNDERTALE battles in the light and dark world!
@@ -36,7 +35,7 @@ Adds **UNDERTALE** battles (and more!) to Kristal!
 ### Programmers:
 * Sam Deluxe (like, everything)
 * FireRainV (post support)
-* Nyako (made the basics and dust code)
+* Nyako (made the basics and dust code + Remake of UT Borders)
 * bor (assistant, map recreations)
 * Just Another Random User (assistant)
 <!-- ## Contributors: -->

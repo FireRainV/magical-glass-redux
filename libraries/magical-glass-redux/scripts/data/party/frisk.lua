@@ -77,7 +77,7 @@ function character:init()
     self.light_xact_color = COLORS.white
     
     -- Dark Battle Colors in the light world
-    self.dmg_color_lw = {1, 64/255, 64/255}
+    self.dmg_color_lw = {1, 0.3, 0.3}
     self.attack_bar_color_lw = COLORS.white
     self.attack_box_color_lw = COLORS.silver
     self.xact_color_lw = COLORS.white

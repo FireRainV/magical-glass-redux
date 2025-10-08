@@ -1892,11 +1892,6 @@ function Battle:shakeCamera(x, y, friction)
     self.camera:shake(x, y, friction)
 end
 
---- Stops the camera shake.
-function Battle:stopCameraShake()
-    self.camera:stopShake()
-end
-
 ---@return "ALL"|PartyBattler
 function Battle:randomTargetOld()
     -- This is "scr_randomtarget_old".
@@ -2305,7 +2300,7 @@ function Battle:checkGameOver()
             wave:onEnd(true)
         end
     end
-    self:stopCameraShake()
+    self:shakeCamera(0)
     if self.encounter:onGameOver() then
         return
     end

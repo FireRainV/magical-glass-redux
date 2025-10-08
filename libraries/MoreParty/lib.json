@@ -1,12 +1,11 @@
 {
     "id": "moreparty",
     
-    "version": "v1.10.2",
+    "version": "v1.10.3",
     "engineVer": "v0.10.0-dev",
     
     "authors": [
         "FireRainV",
-        "Core", // MoreBattle
         "skarph", // Help with ShortAct hook
         "Elioze", // Scroller feature (see 'scroller' config option)
     ],
