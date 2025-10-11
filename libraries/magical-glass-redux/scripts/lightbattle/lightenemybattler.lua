@@ -955,7 +955,6 @@ function LightEnemyBattler:onDefeatVaporized(damage, battler)
     else
         death = DustEffect(sprite:getTexture(), death_x, death_y, false, function() self:remove() end)
     end
-     
     death:setColor(sprite:getDrawColor())
     death:setScale(sprite:getScale())
     self:addChild(death)
