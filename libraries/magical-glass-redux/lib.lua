@@ -495,6 +495,18 @@ function lib:init()
         end
     end)
     
+    Utils.hook(DebugSystem, "returnMenu", function(orig, self)
+        orig(self)
+        if not (#self.menu_history == 0) then
+            self.menu_target_y = 0
+        end
+    end)
+    
+    Utils.hook(DebugSystem, "enterMenu", function(orig, self, menu, soul, skip_history)
+        orig(self, menu, soul, skip_history)
+        self.menu_target_y = 0
+    end)
+    
     Utils.hook(World, "mapTransition", function(orig, self, ...)
         orig(self, ...)
         lib.map_transitioning = true

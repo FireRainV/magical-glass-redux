@@ -209,18 +209,6 @@ function lib:init()
         orig(self, data)
         self.level_up_count = data.level_up_count or self.level_up_count
     end)
-    
-    Utils.hook(DebugSystem, "returnMenu", function(orig, self)
-        orig(self)
-        if not (#self.menu_history == 0) then
-            self.menu_target_y = 0
-        end
-    end)
-    
-    Utils.hook(DebugSystem, "enterMenu", function(orig, self, menu, soul, skip_history)
-        orig(self, menu, soul, skip_history)
-        self.menu_target_y = 0
-    end)
 end
 
 return lib
