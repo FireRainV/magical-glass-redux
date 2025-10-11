@@ -2832,6 +2832,8 @@ function lib:init()
             if MagicalGlassLib.random_encounter and MagicalGlassLib:createRandomEncounter(MagicalGlassLib.random_encounter).population then
                 MagicalGlassLib:createRandomEncounter(MagicalGlassLib.random_encounter):addFlag("violent", 1)
             end
+        else
+            Game.battle.xp = Game.battle.xp - self.experience
         end
     end)
     
@@ -4343,6 +4345,159 @@ function lib:init()
             return true
         end
         return orig(self)
+    end)
+    
+    Utils.hook(ActionBoxDisplay, "draw", function(orig, self) -- Fixes an issue with HP higher than normal + MGR Karma
+        if #Game.battle.party <= 3 then
+            if Game.battle.current_selecting == self.actbox.index then
+                Draw.setColor(self.actbox.battler.chara:getColor())
+            else
+                Draw.setColor(PALETTE["action_strip"], 1)
+            end
+
+            love.graphics.setLineWidth(2)
+            love.graphics.line(0  , Game:getConfig("oldUIPositions") and 2 or 1, 213, Game:getConfig("oldUIPositions") and 2 or 1)
+
+            love.graphics.setLineWidth(2)
+            if Game.battle.current_selecting == self.actbox.index then
+                love.graphics.line(1  , 2, 1,   36)
+                love.graphics.line(212, 2, 212, 36)
+            end
+
+            Draw.setColor(PALETTE["action_fill"])
+            love.graphics.rectangle("fill", 2, Game:getConfig("oldUIPositions") and 3 or 2, 209, Game:getConfig("oldUIPositions") and 34 or 35)
+
+            Draw.setColor(Kristal.getLibConfig("magical-glass", "light_world_dark_battle_color_override") and Game:isLight() and (Game.battle.encounter.karma_mode and MG_PALETTE["player_karma_health_bg"] or MG_PALETTE["player_health_bg"]) or PALETTE["action_health_bg"])
+            love.graphics.rectangle("fill", 128, 22 - self.actbox.data_offset, 76, 9)
+
+            local health = (self.actbox.battler.chara:getHealth() / self.actbox.battler.chara:getStat("health")) * 76
+            local karma_health
+            karma_health = ((self.actbox.battler.chara:getHealth() - self.actbox.battler.karma) / self.actbox.battler.chara:getStat("health")) * 76
+
+            if health > 0 then
+                if Kristal.getLibConfig("magical-glass", "light_world_dark_battle_color_override") and Game:isLight() then
+                    Draw.setColor(MG_PALETTE["player_karma_health"])
+                else
+                    Draw.setColor(MG_PALETTE["player_karma_health_dark"])
+                end
+                love.graphics.rectangle("fill", 128, 22 - self.actbox.data_offset, math.min(math.ceil(health), 76), 9)
+                if Kristal.getLibConfig("magical-glass", "light_world_dark_battle_color_override") and Game:isLight() then
+                    Draw.setColor(MG_PALETTE["player_health"])
+                else
+                    Draw.setColor(self.actbox.battler.chara:getColor())
+                end
+                love.graphics.rectangle("fill", 128, 22 - self.actbox.data_offset, math.min(math.ceil((Game.battle.encounter.karma_mode and karma_health > 1 and (karma_health - 1) or karma_health) or health), 76), 9)
+            end
+
+
+            local color = PALETTE["action_health_text"]
+            if health <= 0 then
+                color = PALETTE["action_health_text_down"]
+            elseif self.actbox.battler.karma > 0 then
+                color = MG_PALETTE["player_karma_text"]
+            elseif (self.actbox.battler.chara:getHealth() <= (self.actbox.battler.chara:getStat("health") / 4)) then
+                color = PALETTE["action_health_text_low"]
+            else
+                color = PALETTE["action_health_text"]
+            end
+
+
+            local health_offset = 0
+            health_offset = (#tostring(self.actbox.battler.chara:getHealth()) - 1) * 8
+
+            Draw.setColor(color)
+            love.graphics.setFont(self.font)
+            love.graphics.print(self.actbox.battler.chara:getHealth(), 152 - health_offset, 9 - self.actbox.data_offset)
+            Draw.setColor(PALETTE["action_health_text"])
+            love.graphics.print("/", 161, 9 - self.actbox.data_offset)
+            local string_width = self.font:getWidth(tostring(self.actbox.battler.chara:getStat("health")))
+            Draw.setColor(color)
+            love.graphics.print(self.actbox.battler.chara:getStat("health"), 205 - string_width, 9 - self.actbox.data_offset)
+
+            Object.draw(self)
+        else
+            orig(self)
+        end
+    end)
+    
+    Utils.hook(OverworldActionBox, "draw", function(orig, self) -- Fixes an issue with HP higher than normal
+        if #Game.party > 3 then orig(self) return end
+        
+        -- Draw the line at the top
+        if self.selected then
+            Draw.setColor(self.chara:getColor())
+        else
+            Draw.setColor(PALETTE["action_strip"])
+        end
+
+        love.graphics.setLineWidth(2)
+        love.graphics.line(0, 1, 213, 1)
+        
+        if Game:getConfig("oldUIPositions") then
+            love.graphics.line(0, 2, 2, 2)
+            love.graphics.line(211, 2, 213, 2)
+        end
+
+        -- Draw health
+        Draw.setColor(PALETTE["action_health_bg"])
+        love.graphics.rectangle("fill", 128, 24, 76, 9)
+
+        local health = (self.chara:getHealth() / self.chara:getStat("health")) * 76
+
+        if health > 0 then
+            Draw.setColor(self.chara:getColor())
+            love.graphics.rectangle("fill", 128, 24, math.min(math.ceil(health), 76), 9)
+        end
+
+        local color = PALETTE["action_health_text"]
+        if health <= 0 then
+            color = PALETTE["action_health_text_down"]
+        elseif (self.chara:getHealth() <= (self.chara:getStat("health") / 4)) then
+            color = PALETTE["action_health_text_low"]
+        else
+            color = PALETTE["action_health_text"]
+        end
+
+        local health_offset = 0
+        health_offset = (#tostring(self.chara:getHealth()) - 1) * 8
+
+        Draw.setColor(color)
+        love.graphics.setFont(self.font)
+        love.graphics.print(self.chara:getHealth(), 152 - health_offset, 11)
+        Draw.setColor(PALETTE["action_health_text"])
+        love.graphics.print("/", 161, 11)
+        local string_width = self.font:getWidth(tostring(self.chara:getStat("health")))
+        Draw.setColor(color)
+        love.graphics.print(self.chara:getStat("health"), 205 - string_width, 11)
+
+        -- Draw name text if there's no sprite
+        if not self.name_sprite then
+            local font = Assets.getFont("name")
+            love.graphics.setFont(font)
+            Draw.setColor(1, 1, 1, 1)
+
+            local name = self.chara:getName():upper()
+            local spacing = 5 - Utils.len(name)
+
+            local off = 0
+            for i = 1, Utils.len(name) do
+                local letter = Utils.sub(name, i, i)
+                love.graphics.print(letter, 51 + off, 16 - 1)
+                off = off + font:getWidth(letter) + spacing
+            end
+        end
+
+        local reaction_x = -1
+
+        if self.x == 0 then -- lazy check for leftmost party member
+            reaction_x = 3
+        end
+
+        love.graphics.setFont(self.main_font)
+        Draw.setColor(1, 1, 1, self.reaction_alpha / 6)
+        love.graphics.print(self.reaction_text, reaction_x, 43, 0, 0.5, 0.5)
+
+        Object.draw(self)
     end)
 end
 
