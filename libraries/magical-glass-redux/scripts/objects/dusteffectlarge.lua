@@ -17,10 +17,13 @@ function DustEffectLarge:init(texture, x, y, allow_black_pixels, after)
     self.canvas:setFilter("nearest", "nearest")
 
     love.graphics.setCanvas(self.canvas)
+        love.graphics.push()
+        love.graphics.origin()
         love.graphics.clear(0, 0, 0, 0)
         love.graphics.setBlendMode("alpha")
         love.graphics.setColor(1, 1, 1, 1)
         love.graphics.draw(self.texture)
+        love.graphics.pop()
     love.graphics.setCanvas()
     
     local data = self.canvas:newImageData()
