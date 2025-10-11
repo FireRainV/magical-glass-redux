@@ -645,6 +645,15 @@ function lib:init()
         orig(self)
         self.light = false
         self.soul_speed_bonus = 0
+        self.backup_palettes = {}
+        
+        if Game:isLight() then
+            for _,palette in ipairs({"action_health", "action_health_bg", "action_health_text", "battle_mercy_bg", "battle_mercy_text"}) do
+                print(palette)
+                self.backup_palettes[palette] = PALETTE[palette]
+                PALETTE[palette] = MG_PALETTE[palette]
+            end
+        end
     end)
     
     Utils.hook(Battle, "postInit", function(orig, self, state, encounter)
@@ -1244,6 +1253,11 @@ function lib:init()
 
     Utils.hook(Battle, "returnToWorld", function(orig, self)
         orig(self)
+        if Game:isLight() then
+            for palette,color in pairs(self.backup_palettes) do
+                PALETTE[palette] = self.backup_palettes[palette]
+            end
+        end
         lib.current_battle_system = nil
     end)
 
