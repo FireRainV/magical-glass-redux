@@ -744,7 +744,7 @@ function lib:init()
         if result or self.state ~= new then
             return
         end
-        if new == "VICTORY" and Game:isLight() then
+        if new == "VICTORY" then
             self.current_selecting = 0
 
             if self.tension_bar then
@@ -774,7 +774,11 @@ function lib:init()
             
             if self.state_reason ~= "FLEE" then
                 if Kristal.getLibConfig("magical-glass", "light_world_dark_battle_tension") then
-                    self.money = self.money + math.floor(Game:getTension() / 5)
+                    if Game:isLight() then
+                        self.money = self.money + math.floor(Game:getTension() / 5)
+                    else
+                        self.money = self.money + (math.floor(((Game:getTension() * 2.5) / 10)) * Game.chapter)
+                    end
                 end
             end
 
@@ -792,24 +796,68 @@ function lib:init()
             --     self.money = 0
             -- end
 
-            Game.lw_money = Game.lw_money + self.money
+            if Game:isLight() then
+                Game.lw_money = Game.lw_money + self.money
+                
+                if (Game.lw_money < 0) then
+                    Game.lw_money = 0
+                end
+            else
+                Game.money = Game.money + self.money
+                Game.xp = Game.xp + self.xp
 
-            if (Game.lw_money < 0) then
-                Game.lw_money = 0
+                if (Game.money < 0) then
+                    Game.money = 0
+                end
             end
 
-            local win_text = "* You won!\n* Got " .. self.xp .. " EXP and " .. self.money .. " "..Game:getConfig("lightCurrency"):lower().."."
-            -- if (in_dojo) then
-            --     win_text == "* You won the battle!"
-            -- end
-            
-            for _,member in ipairs(self.party) do
-                local lv = member.chara:getLightLV()
-                member.chara:addLightEXP(self.xp)
+            if Game:isLight() then
+                local win_text = "* You won!\n* Got " .. self.xp .. " EXP and " .. self.money .. " "..Game:getConfig("lightCurrency"):lower().."."
+                -- if (in_dojo) then
+                --     win_text == "* You won the battle!"
+                -- end
+                
+                for _,member in ipairs(self.party) do
+                    local lv = member.chara:getLightLV()
+                    member.chara:addLightEXP(self.xp)
 
-                if lv ~= member.chara:getLightLV() then
-                    win_text = "* You won!\n* Got " .. self.xp .. " EXP and " .. self.money .. " "..Game:getConfig("lightCurrency"):lower()..".\n* Your "..Kristal.getLibConfig("magical-glass", "light_level_name").." increased."
-                    Assets.stopAndPlaySound("levelup")
+                    if lv ~= member.chara:getLightLV() then
+                        win_text = "* You won!\n* Got " .. self.xp .. " EXP and " .. self.money .. " "..Game:getConfig("lightCurrency"):lower()..".\n* Your "..Kristal.getLibConfig("magical-glass", "light_level_name").." increased."
+                        Assets.stopAndPlaySound("levelup")
+                    end
+                end
+            else
+                local win_text = "* You won!\n* Got " .. self.xp .. " EXP and " .. self.money .. " "..Game:getConfig("darkCurrencyShort").."."
+                -- if (in_dojo) then
+                --     win_text == "* You won the battle!"
+                -- end
+                if self.used_violence and Game:getConfig("growStronger") then
+                    local stronger = "You"
+
+                    local party_to_lvl_up = {}
+                    for _,battler in ipairs(self.party) do
+                        table.insert(party_to_lvl_up, battler.chara)
+                        if Game:getConfig("growStrongerChara") and battler.chara.id == Game:getConfig("growStrongerChara") then
+                            stronger = battler.chara:getName()
+                        end
+                        for _,id in pairs(battler.chara:getStrongerAbsent()) do
+                            table.insert(party_to_lvl_up, Game:getPartyMember(id))
+                        end
+                    end
+                    
+                    for _,party in ipairs(Utils.removeDuplicates(party_to_lvl_up)) do
+                        party.level_up_count = party.level_up_count + 1
+                        party:onLevelUp(party.level_up_count)
+                    end
+
+                    if self.xp == 0 then
+                        win_text = "* You won!\n* Got " .. self.money .. " "..Game:getConfig("darkCurrencyShort")..".\n* "..stronger.." became stronger."
+                    else
+                        win_text = "* You won!\n* Got " .. self.xp .. " EXP and " .. self.money .. " "..Game:getConfig("darkCurrencyShort")..".\n* "..stronger.." became stronger."
+                    end
+
+                    Assets.playSound("dtrans_lw", 0.7, 2)
+                    --scr_levelup()
                 end
             end
 
@@ -827,6 +875,29 @@ function lib:init()
             end
         else
             orig(self, old, new)
+        end
+    end)
+    
+    Utils.hook(Battle, "checkGameOver", function(orig, self)
+        for _,battler in ipairs(self.party) do
+            if not battler.is_down then
+                return
+            end
+        end
+        self.music:stop()
+        if self:getState() == "DEFENDING" then
+            for _,wave in ipairs(self.waves) do
+                wave:onEnd(true)
+            end
+        end
+        self:shakeCamera(0)
+        if self.encounter:onGameOver() then
+            return
+        end
+        if MagicalGlassLib and self.encounter.invincible then
+            MagicalGlassLib:gameNotOver(self:getSoulLocation())
+        else
+            Game:gameOver(self:getSoulLocation())
         end
     end)
     
