@@ -2774,18 +2774,22 @@ function LightBattle:nextParty()
                 end
             end
             if not found then
-                local group
+                local group = {}
                 for _,pair in ipairs(self:actionButtonPairs()) do
                     if Utils.containsValue(pair, last_button_type) then
-                        group = pair
-                        break
+                        table.insert(group, pair)
                     end
                 end
-                if group then
+                if #group > 0 then
                     for i,button in ipairs(action_box:getSelectableButtons() or {}) do
-                        if Utils.containsValue(group, button.type) then
-                            action_box.selected_button = i
-                            found = true
+                        for _,pair in ipairs(group) do
+                            if Utils.containsValue(pair, button.type) then
+                                action_box.selected_button = i
+                                found = true
+                                break
+                            end
+                        end
+                        if found then
                             break
                         end
                     end
