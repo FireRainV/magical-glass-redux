@@ -1013,6 +1013,9 @@ function lib:init()
         
         -- Whether Karma (KR) UI changes will appear.
         self.karma_mode = false
+        
+        -- Whether "* But it refused." will replace the game over and revive the player.
+        self.invincible = false
 
         -- Whether the flee command is available at the mercy button
         self.can_flee = Game:isLight()
