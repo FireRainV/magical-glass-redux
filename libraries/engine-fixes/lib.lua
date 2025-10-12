@@ -104,9 +104,6 @@ function lib:init()
         -- Message will show even if the member is the soul character
         self.force_gameover_message = false
         
-        -- The number of times that this party member got stronger (saved to the save file)
-        self.level_up_count = 0
-        
         -- Battle soul position offset (optional)
         self.soul_offset = nil
         
@@ -133,16 +130,6 @@ function lib:init()
             end
         end
         return -9, -9
-    end)
-    
-    Utils.hook(PartyMember, "onSave", function(orig, self, data)
-        orig(self, data)
-        data["level_up_count"] = self.level_up_count
-    end)
-    
-    Utils.hook(PartyMember, "onLoad", function(orig, self, data)
-        orig(self, data)
-        self.level_up_count = data.level_up_count or self.level_up_count
     end)
 end
 
