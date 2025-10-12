@@ -657,11 +657,12 @@ function lib:init()
         orig(self)
         self.light = false
         self.soul_speed_bonus = 0
+        self.used_violence_backup = false
+        self.money_backup = 0
         self.backup_palettes = {}
         
         if Game:isLight() then
             for _,palette in ipairs({"action_health", "action_health_bg", "action_health_text", "battle_mercy_bg", "battle_mercy_text"}) do
-                print(palette)
                 self.backup_palettes[palette] = PALETTE[palette]
                 PALETTE[palette] = MG_PALETTE[palette]
             end
@@ -685,15 +686,6 @@ function lib:init()
             self.tension_bar:remove()
             self.tension_bar = nil
         end
-    end)
-    
-    Utils.hook(Battle, "onKeyPressed", function(orig, self, key)
-        if Kristal.Config["debug"] and Input.ctrl() then
-            if key == "y" and Utils.containsValue({"DEFENDING", "DEFENDINGBEGIN"}, self.state) and Game:isLight() then
-                Game.battle:setState("DEFENDINGEND", "NONE")
-            end
-        end
-        orig(self, key)
     end)
     
     Utils.hook(Battle, "drawBackground", function(orig, self)
@@ -738,168 +730,6 @@ function lib:init()
             if Input.pressed("confirm") then orig(self) end
         end)
     end
-    
-    Utils.hook(Battle, "onStateChange", function(orig, self, old, new)
-        local result = self.encounter:beforeStateChange(old,new)
-        if result or self.state ~= new then
-            return
-        end
-        if new == "VICTORY" then
-            self.current_selecting = 0
-
-            if self.tension_bar then
-                self.tension_bar:hide()
-            end
-
-            for _,battler in ipairs(self.party) do
-                battler:setSleeping(false)
-                battler.defending = false
-                battler.action = nil
-                
-                battler.chara:setHealth(battler.chara:getHealth() - battler.karma)
-                battler.karma = 0
-
-                battler.chara:resetBuffs()
-
-                if battler.chara:getHealth() <= 0 then
-                    battler:revive()
-                    battler.chara:setHealth(battler.chara:autoHealAmount())
-                end
-
-                battler:setAnimation("battle/victory")
-
-                local box = self.battle_ui.action_boxes[self:getPartyIndex(battler.chara.id)]
-                box:resetHeadIcon()
-            end
-            
-            if self.state_reason ~= "FLEE" then
-                if Kristal.getLibConfig("magical-glass", "light_world_dark_battle_tension") then
-                    if Game:isLight() then
-                        self.money = self.money + math.floor(Game:getTension() / 5)
-                    else
-                        self.money = self.money + (math.floor(((Game:getTension() * 2.5) / 10)) * Game.chapter)
-                    end
-                end
-            end
-
-            for _,battler in ipairs(self.party) do
-                for _,equipment in ipairs(battler.chara:getEquipment()) do
-                    self.money = math.floor(equipment:applyMoneyBonus(self.money) or self.money)
-                end
-            end
-
-            self.money = math.floor(self.money)
-
-            self.money = self.encounter:getVictoryMoney(self.money) or self.money
-            self.xp = self.encounter:getVictoryXP(self.xp) or self.xp
-            -- if (in_dojo) then
-            --     self.money = 0
-            -- end
-
-            if Game:isLight() then
-                Game.lw_money = Game.lw_money + self.money
-                
-                if (Game.lw_money < 0) then
-                    Game.lw_money = 0
-                end
-            else
-                Game.money = Game.money + self.money
-                Game.xp = Game.xp + self.xp
-
-                if (Game.money < 0) then
-                    Game.money = 0
-                end
-            end
-
-            if Game:isLight() then
-                local win_text = "* You won!\n* Got " .. self.xp .. " EXP and " .. self.money .. " "..Game:getConfig("lightCurrency"):lower().."."
-                -- if (in_dojo) then
-                --     win_text == "* You won the battle!"
-                -- end
-                
-                for _,member in ipairs(self.party) do
-                    local lv = member.chara:getLightLV()
-                    member.chara:addLightEXP(self.xp)
-
-                    if lv ~= member.chara:getLightLV() then
-                        win_text = "* You won!\n* Got " .. self.xp .. " EXP and " .. self.money .. " "..Game:getConfig("lightCurrency"):lower()..".\n* Your "..Kristal.getLibConfig("magical-glass", "light_level_name").." increased."
-                        Assets.stopAndPlaySound("levelup")
-                    end
-                end
-            else
-                local win_text = "* You won!\n* Got " .. self.xp .. " EXP and " .. self.money .. " "..Game:getConfig("darkCurrencyShort").."."
-                -- if (in_dojo) then
-                --     win_text == "* You won the battle!"
-                -- end
-                if self.used_violence and Game:getConfig("growStronger") then
-                    local stronger = "You"
-
-                    local party_to_lvl_up = {}
-                    for _,battler in ipairs(self.party) do
-                        table.insert(party_to_lvl_up, battler.chara)
-                        if Game:getConfig("growStrongerChara") and battler.chara.id == Game:getConfig("growStrongerChara") then
-                            stronger = battler.chara:getName()
-                        end
-                        for _,id in pairs(battler.chara:getStrongerAbsent()) do
-                            table.insert(party_to_lvl_up, Game:getPartyMember(id))
-                        end
-                    end
-                    
-                    for _,party in ipairs(Utils.removeDuplicates(party_to_lvl_up)) do
-                        party.level_up_count = party.level_up_count + 1
-                        party:onLevelUp(party.level_up_count)
-                    end
-
-                    if self.xp == 0 then
-                        win_text = "* You won!\n* Got " .. self.money .. " "..Game:getConfig("darkCurrencyShort")..".\n* "..stronger.." became stronger."
-                    else
-                        win_text = "* You won!\n* Got " .. self.xp .. " EXP and " .. self.money .. " "..Game:getConfig("darkCurrencyShort")..".\n* "..stronger.." became stronger."
-                    end
-
-                    Assets.playSound("dtrans_lw", 0.7, 2)
-                    --scr_levelup()
-                end
-            end
-
-            win_text = self.encounter:getVictoryText(win_text, self.money, self.xp) or win_text
-
-            if self.encounter.no_end_message then
-                self:setState("TRANSITIONOUT")
-                self.encounter:onBattleEnd()
-            else
-                self:battleText(win_text, function()
-                    self:setState("TRANSITIONOUT")
-                    self.encounter:onBattleEnd()
-                    return true
-                end)
-            end
-        else
-            orig(self, old, new)
-        end
-    end)
-    
-    Utils.hook(Battle, "checkGameOver", function(orig, self)
-        for _,battler in ipairs(self.party) do
-            if not battler.is_down then
-                return
-            end
-        end
-        self.music:stop()
-        if self:getState() == "DEFENDING" then
-            for _,wave in ipairs(self.waves) do
-                wave:onEnd(true)
-            end
-        end
-        self:shakeCamera(0)
-        if self.encounter:onGameOver() then
-            return
-        end
-        if MagicalGlassLib and self.encounter.invincible then
-            MagicalGlassLib:gameNotOver(self:getSoulLocation())
-        else
-            Game:gameOver(self:getSoulLocation())
-        end
-    end)
     
     Utils.hook(Soul, "init", function(orig, self, x, y, color)
         orig(self, x, y, color)
@@ -1013,9 +843,6 @@ function lib:init()
         
         -- Whether Karma (KR) UI changes will appear.
         self.karma_mode = false
-        
-        -- Whether "* But it refused." will replace the game over and revive the player.
-        self.invincible = false
 
         -- Whether the flee command is available at the mercy button
         self.can_flee = Game:isLight()
@@ -1068,6 +895,31 @@ function lib:init()
             else
                 return self:getFleeMessage()
             end
+        elseif Game:isLight() then
+            local win_text = "* You won!\n* Got " .. xp .. " EXP and " .. money .. " "..Game:getConfig("lightCurrency"):lower().."."
+            -- if (in_dojo) then
+            --     win_text == "* You won the battle!"
+            -- end
+            
+            for _,member in ipairs(Game.battle.party) do
+                local lv = member.chara:getLightLV()
+                member.chara:addLightEXP(xp)
+
+                if lv ~= member.chara:getLightLV() then
+                    win_text = "* You won!\n* Got " .. xp .. " EXP and " .. money .. " "..Game:getConfig("lightCurrency"):lower()..".\n* Your "..Kristal.getLibConfig("magical-glass", "light_level_name").." increased."
+                    Assets.stopAndPlaySound("levelup")
+                end
+            end
+            
+            return win_text
+        elseif xp ~= 0 and Game.battle.used_violence and Game:getConfig("growStronger") then
+            local stronger = "You"
+            for _,battler in ipairs(Game.battle.party) do
+                if Game:getConfig("growStrongerChara") and battler.chara.id == Game:getConfig("growStrongerChara") then
+                    stronger = battler.chara:getName()
+                end
+            end
+            return "* You won!\n* Got " .. xp .. " EXP and " .. money .. " "..Game:getConfig("darkCurrencyShort")..".\n* "..stronger.." became stronger."
         else
             return orig(self, text, money, xp)
         end
@@ -1116,6 +968,63 @@ function lib:init()
     end)
     
     Utils.hook(Encounter, "onFleeFail", function(orig, self) end)
+    
+    Utils.hook(Encounter, "beforeStateChange", function(orig, self, old, new)
+        if new == "VICTORY" then
+            if Game:isLight() then
+                Game.battle.used_violence_backup = Game.battle.used_violence
+                Game.battle.used_violence = false
+                Game.battle.money_backup = Game.money
+            end
+        end
+        return orig(self, old, new)
+    end)
+    
+    Utils.hook(Encounter, "onStateChange", function(orig, self, old, new)
+        if new == "VICTORY" then
+            for _,battler in ipairs(Game.battle.party) do
+                battler.chara:setHealth(battler.chara:getHealth() - battler.karma)
+                battler.karma = 0
+            end
+            
+            if Game:isLight() then
+                Game.lw_money = Game.lw_money + Game.battle.money
+                Game.money = Game.battle.money_backup
+                Game.xp = Game.xp - Game.battle.xp
+                
+                if (Game.lw_money < 0) then
+                    Game.lw_money = 0
+                end
+                
+                Game.battle.used_violence = Game.battle.used_violence_backup
+            end
+        end
+        return orig(self, old, new)
+    end)
+    
+    Utils.hook(Encounter, "getVictoryMoney", function(orig, self, money)
+        if Game.battle.state_reason == "FLEE" or Game:isLight() then
+            local tension_money = math.floor(((Game:getTension() * 2.5) / 10)) * Game.chapter
+            for _,battler in ipairs(Game.battle.party) do
+                for _,equipment in ipairs(battler.chara:getEquipment()) do
+                    tension_money = math.floor(equipment:applyMoneyBonus(tension_money) or tension_money)
+                end
+            end
+            money = math.floor(money - tension_money)
+        end
+        
+        if Game:isLight() and Kristal.getLibConfig("magical-glass", "light_world_dark_battle_tension") and Game.battle.state_reason ~= "FLEE" then
+            local tension_money = math.floor(Game:getTension() / 5)
+            for _,battler in ipairs(Game.battle.party) do
+                for _,equipment in ipairs(battler.chara:getEquipment()) do
+                    tension_money = math.floor(equipment:applyMoneyBonus(tension_money) or tension_money)
+                end
+            end
+            money = math.floor(money + tension_money)
+        end
+        
+        return money
+    end)
 
     Utils.hook(Game, "encounter", function(orig, self, encounter, transition, enemy, context, light)
         if lib.current_battle_system then
