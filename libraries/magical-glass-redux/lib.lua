@@ -2671,24 +2671,12 @@ function lib:init()
         self.already_has_flee_button = false
         self.flee_button = nil
         
-        self.has_save = false
-        self.already_has_save_button = false
-        self.save_button = nil
-        
         -- Karma (KR) calculations
         self.karma = 0
         self.karma_timer = 0
         self.karma_bonus = 0
         self.prev_health = 0
         self.inv_bonus = 0
-    end)
-    
-    Utils.hook(PartyBattler, "toggleSaveButton", function(orig, self, value)
-        if value == nil then
-            self.has_save = not self.has_save
-        else
-            self.has_save = value
-        end
     end)
     
     Utils.hook(PartyBattler, "addKarma", function(orig, self, amount)
@@ -2786,9 +2774,6 @@ function lib:init()
     Utils.hook(EnemyBattler, "init", function(orig, self, actor, use_overlay)
         orig(self, actor, use_overlay)
         
-        -- Whether selecting the enemy using SAVE will skip the turn (similar to the end of the Asirel fight in UT)
-        self.save_no_acts = false
-        
         -- Whether this enemy can die, and whether it's the Undertale death or Deltarune death
         self.can_die = Game:isLight() and true or false
         self.ut_death = Game:isLight() and true or false
@@ -2802,21 +2787,6 @@ function lib:init()
         
         -- Whether the enemy deals bonus damage when having more HP (Light World only)
         self.bonus_damage = true
-    end)
-    
-    Utils.hook(EnemyBattler, "onSave", function(orig, self, battler) end)
-    
-    Utils.hook(EnemyBattler, "onActStart", function(orig, self, battler, name)
-        if name == "_SAVE" then
-            local encounter_text = Game.battle.battle_ui.encounter_text
-            battler:setAnimation("battle/act", function()
-                if encounter_text.text.text == "" then
-                    encounter_text:advance()
-                end
-            end)
-        else
-            orig(self, battler, name)
-        end
     end)
     
     Utils.hook(EnemyBattler, "onHurt", function(orig, self, damage, battler)
@@ -4269,20 +4239,6 @@ function lib:init()
             end
         end
         
-        if not self.battler.already_has_save_button and Game.battle:getPartyIndex(self.battler.chara.id) == Game.battle.current_selecting then
-            if self.battler.has_save then
-                if self.type == "act" then
-                    self.battler.save_button = true
-                    reload_buttons = 1
-                end
-            else
-                if self.type == savebutton().type then
-                    self.battler.save_button = false
-                    reload_buttons = 1
-                end
-            end
-        end
-        
         if reload_buttons == 1 then
             Game.battle.battle_ui.action_boxes[Game.battle.current_selecting]:createButtons()
         elseif reload_buttons == 2 then
@@ -4714,29 +4670,6 @@ function lib:modifyActionButtons(battler, buttons)
         for i,button in ipairs(buttons) do
             if button == fleebutton().type then
                 buttons[i] = "spare"
-                break
-            end
-        end
-    end
-    
-    if battler.save_button == nil and not battler.already_has_save_button then
-        for i,button in ipairs(buttons) do
-            if button == savebutton().type then
-                battler.already_has_save_button = true
-                buttons[i] = savebutton()
-            end
-        end
-    elseif battler.save_button == true then
-        for i,button in ipairs(buttons) do
-            if button == "act" then
-                buttons[i] = savebutton()
-                break
-            end
-        end
-    elseif battler.save_button == false then
-        for i,button in ipairs(buttons) do
-            if button == savebutton().type then
-                buttons[i] = "act"
                 break
             end
         end

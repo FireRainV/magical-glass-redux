@@ -1327,7 +1327,7 @@ function Lib:init()
     end)
     
     Utils.hook(ActionButton, "hasSpecial", function(orig, self)
-        if (self.type == "act" or MagicalGlassLib and self.type == "save") and not Kristal.getLibConfig("moreparty", "classic_mode") and #Game.battle.party > 3 and self.battler.chara:hasSpells() then
+        if self.type == "act" and not Kristal.getLibConfig("moreparty", "classic_mode") and #Game.battle.party > 3 and self.battler.chara:hasSpells() then
             if self.battler then
                 local has_tired = false
                 for _,enemy in ipairs(Game.battle:getActiveEnemies()) do
