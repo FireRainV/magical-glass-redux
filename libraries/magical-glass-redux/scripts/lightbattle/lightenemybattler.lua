@@ -178,7 +178,7 @@ end
 function LightEnemyBattler:getDamageOffset() return self.damage_offset end
 
 function LightEnemyBattler:shouldDisplayTiredMessage()
-    return self.tired_percentage > 0
+    return true
 end
 
 function LightEnemyBattler:shouldDisplayAwakeMessage()
