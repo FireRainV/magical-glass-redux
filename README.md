@@ -11,7 +11,7 @@ Adds **UNDERTALE** battles (and more!) to Kristal!
 ## This library adds:
 * UNDERTALE battles in the light and dark world!
 * UNDERTALE shops!
-* All of UNDERTALE's weapons and armors!
+* All of UNDERTALE's items!
 * Functionality for Spells and TP!
 * A Froggit encounter!
 * Frisk UNDERTALE!
