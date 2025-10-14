@@ -39,10 +39,10 @@ Adds **UNDERTALE** battles (and more!) to Kristal!
 * bor (assistant, map recreations)
 * Just Another Random User (assistant)
 <!-- ## Contributors: -->
-## Moldsmal Recreation:
+### Moldsmal Recreation:
 * BrendaK2700
 
-## Frisk Recreation:
+### Frisk Recreation:
 * SadDiamondMan
 * FireRainV
 
