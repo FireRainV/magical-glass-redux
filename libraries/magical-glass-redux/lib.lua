@@ -1688,24 +1688,24 @@ function lib:init()
             elseif maxed then
                 message = "* " .. target.chara:getNameOrYou() .. "'s HP was maxed out."
             else
-                message = "* " .. target.chara:getNameOrYou() .. " recovered " .. amount .. " HP."
+                message = "* " .. target.chara:getNameOrYou() .. " recovered " .. amount .. " HP!"
             end
         elseif self.target == "party" then
             if #Game.battle.party > 1 then
-                message = "* Everyone recovered " .. amount .. " HP."
+                message = "* Everyone recovered " .. amount .. " HP!"
             elseif maxed then
                 message = "* Your HP was maxed out."
             else
-                message = "* You recovered " .. amount .. " HP."
+                message = "* You recovered " .. amount .. " HP!"
             end
         elseif self.target == "enemy" then
             if maxed then
                 message = "* " .. target.name .. "'s HP was maxed out."
             else
-                message = "* " .. target.name .. " recovered " .. amount .. " HP."
+                message = "* " .. target.name .. " recovered " .. amount .. " HP!"
             end
         elseif self.target == "enemies" then
-            message = "* The enemies recovered " .. amount .. " HP."
+            message = "* The enemies recovered " .. amount .. " HP!"
         end
         return message
     end)
@@ -2498,24 +2498,24 @@ function lib:init()
             elseif maxed then
                 message = "* " .. target.chara:getNameOrYou() .. "'s HP was maxed out."
             else
-                message = "* " .. target.chara:getNameOrYou() .. " recovered " .. amount .. " HP."
+                message = "* " .. target.chara:getNameOrYou() .. " recovered " .. amount .. " HP!"
             end
         elseif self.target == "party" then
             if #Game.battle.party > 1 then
-                message = "* Everyone recovered " .. amount .. " HP."
+                message = "* Everyone recovered " .. amount .. " HP!"
             elseif maxed then
                 message = "* Your HP was maxed out."
             else
-                message = "* You recovered " .. amount .. " HP."
+                message = "* You recovered " .. amount .. " HP!"
             end
         elseif self.target == "enemy" then
             if maxed then
                 message = "* " .. target.name .. "'s HP was maxed out."
             else
-                message = "* " .. target.name .. " recovered " .. amount .. " HP."
+                message = "* " .. target.name .. " recovered " .. amount .. " HP!"
             end
         elseif self.target == "enemies" then
-            message = "* The enemies recovered " .. amount .. " HP."
+            message = "* The enemies recovered " .. amount .. " HP!"
         end
         return message
     end)
@@ -2534,15 +2534,15 @@ function lib:init()
             elseif maxed then
                 message = "* " .. target:getNameOrYou() .. "'s HP was maxed out."
             else
-                message = "* " .. target:getNameOrYou() .. " recovered " .. amount .. " HP."
+                message = "* " .. target:getNameOrYou() .. " recovered " .. amount .. " HP!"
             end
         elseif self.target == "party" then
             if #Game.party > 1 then
-                message = "* Everyone recovered " .. amount .. " HP."
+                message = "* Everyone recovered " .. amount .. " HP!"
             elseif maxed then
                 message = "* Your HP was maxed out."
             else
-                message = "* You recovered " .. amount .. " HP."
+                message = "* You recovered " .. amount .. " HP!"
             end
         end
         return message
@@ -4008,15 +4008,15 @@ function lib:init()
             elseif maxed then
                 message = "* " .. target:getNameOrYou() .. "'s HP was maxed out."
             else
-                message = "* " .. target:getNameOrYou() .. " recovered " .. amount .. " HP."
+                message = "* " .. target:getNameOrYou() .. " recovered " .. amount .. " HP!"
             end
         elseif self.target == "party" then
             if #Game.party > 1 then
-                message = "* Everyone recovered " .. amount .. " HP."
+                message = "* Everyone recovered " .. amount .. " HP!"
             elseif maxed then
                 message = "* Your HP was maxed out."
             else
-                message = "* You recovered " .. amount .. " HP."
+                message = "* You recovered " .. amount .. " HP!"
             end
         end
         return message
@@ -4113,24 +4113,24 @@ function lib:init()
             elseif maxed then
                 message = "* " .. target.chara:getNameOrYou() .. "'s HP was maxed out."
             else
-                message = "* " .. target.chara:getNameOrYou() .. " recovered " .. amount .. " HP."
+                message = "* " .. target.chara:getNameOrYou() .. " recovered " .. amount .. " HP!"
             end
         elseif self.target == "party" then
             if #Game.battle.party > 1 then
-                message = "* Everyone recovered " .. amount .. " HP."
+                message = "* Everyone recovered " .. amount .. " HP!"
             elseif maxed then
                 message = "* Your HP was maxed out."
             else
-                message = "* You recovered " .. amount .. " HP."
+                message = "* You recovered " .. amount .. " HP!"
             end
         elseif self.target == "enemy" then
             if maxed then
                 message = "* " .. target.name .. "'s HP was maxed out."
             else
-                message = "* " .. target.name .. " recovered " .. amount .. " HP."
+                message = "* " .. target.name .. " recovered " .. amount .. " HP!"
             end
         elseif self.target == "enemies" then
-            message = "* The enemies recovered " .. amount .. " HP."
+            message = "* The enemies recovered " .. amount .. " HP!"
         end
         return message
     end)

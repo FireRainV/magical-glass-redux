@@ -28,7 +28,7 @@ function item:init()
     self.result_item = nil
 
     -- Amount this item heals
-    self.heal_amount = 10
+    self.heal_amount = 1
 
     -- Amount this item heals for in the overworld (optional)
     self.world_heal_amount = nil
@@ -124,7 +124,7 @@ function item:getLightBattleHealingText(user, target, amount)
         elseif maxed then
             message = "* " .. target.chara:getNameOrYou() .. "'s HP was maxed out."
         else
-            message = "* " .. target.chara:getNameOrYou() .. " recovered " .. amount .. " HP."
+            message = "* " .. target.chara:getNameOrYou() .. " recovered " .. amount .. " HP!"
         end
     end
     return message
@@ -143,7 +143,7 @@ function item:getLightWorldHealingText(target, amount, maxed)
     elseif maxed then
         message = "* " .. target:getName() .. "'s HP was maxed out."
     else
-        message = "* " .. target:getNameOrYou() .. " recovered " .. amount .. " HP."
+        message = "* " .. target:getNameOrYou() .. " recovered " .. amount .. " HP!"
     end
     return message
 end
