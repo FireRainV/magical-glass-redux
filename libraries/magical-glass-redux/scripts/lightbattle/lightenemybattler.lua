@@ -92,9 +92,15 @@ function LightEnemyBattler:init(actor, use_overlay)
     self.tired_text = nil
     self.spareable_text = nil
 
-    self.tired_percentage = Game:isLight() and 0 or 0.5
-    self.spare_percentage = Game:isLight() and 0.25 or 0
-    self.low_health_percentage = Game:isLight() and 0.25 or 0.5
+    if Game:isLight() then
+        self.tired_percentage = nil
+        self.spare_percentage = 0.25
+        self.low_health_percentage = 0.25
+    else
+        self.tired_percentage = 0.5
+        self.spare_percentage = nil
+        self.low_health_percentage = 0.5
+    end
 
     -- Speech bubble style - defaults to "round" or "cyber", depending on chapter
     -- This is set to nil in `battler.lua` as well, but it's here for completion's sake.
@@ -547,7 +553,7 @@ function LightEnemyBattler:getEncounterText()
         return self.spareable_text
     end
 
-    if self.low_health_text and self.health <= (self.max_health * self.low_health_percentage) then
+    if type(self.low_health_percentage) == "number" and self.low_health_text and self.health <= (self.max_health * self.low_health_percentage) then
         return self.low_health_text
 
     elseif self.tired_text and self.tired then
@@ -868,11 +874,11 @@ function LightEnemyBattler:onHurt(damage, battler)
         end
     end)
 
-    if self.health <= (self.max_health * self.tired_percentage) then
+    if type(self.tired_percentage) == "number" and self.health <= (self.max_health * self.tired_percentage) then
         self:setTired(true)
     end
 
-    if self.health <= (self.max_health * self.spare_percentage) then
+    if type(self.spare_percentage) == "number" and self.health <= (self.max_health * self.spare_percentage) then
         self.mercy = 100
     end
 end
