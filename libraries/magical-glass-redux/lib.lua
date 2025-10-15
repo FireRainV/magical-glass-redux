@@ -2761,8 +2761,8 @@ function lib:init()
         -- Whether this enemy should use bigger dust particles upon death when ut_death is enabled.
         self.large_dust = false
         
-        self.tired_percentage = Game:isLight() and 0 or 0.5
-        self.spare_percentage = Game:isLight() and 0.25 or 0
+        self.tired_percentage = Game:isLight() and -1 or 0.5
+        self.spare_percentage = Game:isLight() and 0.25 or -1
         self.low_health_percentage = Game:isLight() and 0.25 or 0.5
         
         -- Whether the enemy deals bonus damage when having more HP (Light World only)

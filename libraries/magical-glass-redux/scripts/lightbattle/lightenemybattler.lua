@@ -92,8 +92,8 @@ function LightEnemyBattler:init(actor, use_overlay)
     self.tired_text = nil
     self.spareable_text = nil
 
-    self.tired_percentage = Game:isLight() and 0 or 0.5
-    self.spare_percentage = Game:isLight() and 0.25 or 0
+    self.tired_percentage = Game:isLight() and -1 or 0.5
+    self.spare_percentage = Game:isLight() and 0.25 or -1
     self.low_health_percentage = Game:isLight() and 0.25 or 0.5
 
     -- Speech bubble style - defaults to "round" or "cyber", depending on chapter
