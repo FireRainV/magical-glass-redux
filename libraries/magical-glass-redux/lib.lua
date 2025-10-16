@@ -2761,12 +2761,9 @@ function lib:init()
         -- Whether this enemy should use bigger dust particles upon death when ut_death is enabled.
         self.large_dust = false
         
-        self.spare_percentage = nil
-        if Game:isLight() then
-            self.tired_percentage = nil
-            self.spare_percentage = 0.25
-            self.low_health_percentage = 0.25
-        end
+        self.tired_percentage = Game:isLight() and 0 or 0.5
+        self.spare_percentage = Game:isLight() and 0.25 or 0
+        self.low_health_percentage = Game:isLight() and 0.25 or 0.5
         
         -- Whether the enemy deals bonus damage when having more HP (Light World only)
         self.bonus_damage = true
@@ -2775,7 +2772,7 @@ function lib:init()
     Utils.hook(EnemyBattler, "onHurt", function(orig, self, damage, battler)
         orig(self, damage, battler)
         
-        if type(self.spare_percentage) == "number" and self.health <= (self.max_health * self.spare_percentage) then
+        if self.health <= (self.max_health * self.spare_percentage) then
             self.mercy = 100
         end
     end)
