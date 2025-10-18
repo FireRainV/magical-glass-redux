@@ -96,7 +96,6 @@ function item:getBattleText(user, target)
 end
 
 function item:onLightBattleUse(user, target)
-    Assets.stopAndPlaySound("power")
     local amount = self:getBattleHealAmount(target.chara.id)
     for _,equip in ipairs(user.chara:getEquipment()) do
         if equip.getHealBonus then

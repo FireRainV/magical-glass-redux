@@ -65,7 +65,6 @@ function item:onWorldUse(target)
     end
     amount = amount + best_amount
 
-    Assets.playSound("power")
     if target.id == Game.party[1].id then
         Game.world:heal(target, amount, "* You re-applied the bandage.", self)
     else
@@ -87,7 +86,6 @@ function item:getBattleText(user, target)
 end
 
 function item:onLightBattleUse(user, target)
-    Assets.stopAndPlaySound("power")
     local amount = self:getBattleHealAmount(target.chara.id)
     for _,equip in ipairs(user.chara:getEquipment()) do
         if equip.getHealBonus then
