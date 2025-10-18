@@ -9,7 +9,7 @@
         "Just Another Random User",     // contributor
     ],
     "dependencies": ["engine-fixes"],
-    "version": "v3.5.3",
+    "version": "v3.6.0",
     "engineVer": "v0.10.0-dev",
 
     "config": {
@@ -117,6 +117,11 @@
         // This works somewhat differently than normal, because almost everyone can equip any light item, so the mechanic was adjusted.
         /////
         "equipment_conversion": true,
+        
+        ///// Light Inventory Equipment Conversion
+        // Like in Deltarune, converts light equipments that are in your light inventory to your dark inventory.
+        /////
+        "light_inventory_equipment_conversion": true,
         
         ///// Health Conversion
         // Converts the party members current health between the light and dark worlds.

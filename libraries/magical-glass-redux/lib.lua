@@ -1430,11 +1430,20 @@ function lib:init()
             end
         end)
     end
-    Utils.hook(LightEquipItem, "convertToDark", function(orig, self, inventory) return false end)
+    Utils.hook(LightEquipItem, "convertToDark", function(orig, self, inventory)
+        if not Kristal.getLibConfig("magical-glass", "light_inventory_equipment_conversion") or Game.inventory:getItemIndex(self) ~= "items" then
+            return false
+        elseif self.delete_on_convert then
+            return true
+        else
+            return orig(self, inventory)
+        end
+    end)
     
     Utils.hook(LightEquipItem, "init", function(orig, self)
         orig(self)
         
+        self.delete_on_convert = false
         self.storage, self.index = nil, nil
 
         self.target = "ally"
@@ -1480,6 +1489,10 @@ function lib:init()
             Assets.playSound("item")
             if replacing then
                 Game.inventory:replaceItem(self, replacing)
+                if Kristal.getLibConfig("magical-glass", "light_inventory_equipment_conversion") and self.type == "weapon" and not self.dark_item and replacing.dark_item == chara:getFlag("dark_weapon") then
+                    self.delete_on_convert = false
+                    replacing.delete_on_convert = true
+                end
             end
             if self.type == "weapon" then
                 chara:setWeapon(self)
@@ -1551,6 +1564,10 @@ function lib:init()
             Assets.playSound("item")
             if replacing then
                 Game.inventory:addItemTo(self.storage, self.index, replacing)
+                if Kristal.getLibConfig("magical-glass", "light_inventory_equipment_conversion") and self.type == "weapon" and not self.dark_item and replacing.dark_item == chara:getFlag("dark_weapon") then
+                    self.delete_on_convert = false
+                    replacing.delete_on_convert = true
+                end
             end
             if self.type == "weapon" then
                 chara:setWeapon(self)
@@ -1582,6 +1599,10 @@ function lib:init()
             Assets.playSound("item")
             if replacing then
                 Game.inventory:addItemTo(self.storage, self.index, replacing)
+                if Kristal.getLibConfig("magical-glass", "light_inventory_equipment_conversion") and self.type == "weapon" and not self.dark_item and replacing.dark_item == chara:getFlag("dark_weapon") then
+                    self.delete_on_convert = false
+                    replacing.delete_on_convert = true
+                end
             end
             if self.type == "weapon" then
                 chara:setWeapon(self)
@@ -1594,6 +1615,16 @@ function lib:init()
             Game.inventory:addItemTo(self.storage, self.index, self)
         end
         self.storage, self.index = nil, nil
+    end)
+    
+    Utils.hook(LightEquipItem, "onSave", function(orig, self, data)
+        orig(self, data)
+        data.delete_on_convert = self.delete_on_convert
+    end)
+    
+    Utils.hook(LightEquipItem, "onLoad", function(orig, self, data)
+        orig(self, data)
+        self.delete_on_convert = data.delete_on_convert
     end)
     
     Utils.hook(Item, "getEquipDisplayName", function(orig, self)
